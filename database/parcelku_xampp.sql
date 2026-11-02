@@ -219,6 +219,14 @@ CREATE TABLE IF NOT EXISTS gallery (
     created  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Foto unggahan bila disimpan di database (STORAGE=db, dipakai di Vercel / hosting tanpa penyimpanan tetap)
+CREATE TABLE IF NOT EXISTS uploads (
+    name     VARCHAR(80) PRIMARY KEY,
+    mime     VARCHAR(30) NOT NULL,
+    data     LONGBLOB NOT NULL,
+    created  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS settings (
     `key`  VARCHAR(40) PRIMARY KEY,
     value  VARCHAR(200) NULL
@@ -277,7 +285,6 @@ SELECT * FROM v_orders WHERE status <> 'selesai';
 
 CREATE OR REPLACE VIEW v_rating AS
 SELECT COUNT(*) AS jumlah_ulasan, ROUND(AVG(rating), 2) AS rata_rata FROM reviews;
-
 
 -- ---------------------------------------------------------------------------
 --  DATA AWAL

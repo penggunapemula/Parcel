@@ -24,6 +24,8 @@ const SET_FIELDS = [
   ["ongkir_km_gratis", "Gratis sampai (km)"],
   ["ongkir_per_km", "Tambahan per km (Rp)"],
   ["ongkir_gratis_min", "Gratis ongkir jika belanja ≥ (Rp)"],
+  ["kapasitas_harian", "Kapasitas parcel per hari (0 = tanpa batas)"],
+  ["min_hari_pesan", "Minimal pesan berapa hari sebelum acara"],
 ];
 const PH =
   '<div class="ph"><span>📦</span><p>Pilih pesanan di daftar untuk melihat detail, chat, dan mengubah status.</p></div>';
@@ -157,7 +159,7 @@ function show(id) {
   <div class="pay" style="margin-top:10px"><input type="number" id="paid" min="0" max="${o.total}" value="${o.paid}" aria-label="Nominal sudah dibayar"><button class="btn ghost" id="full">Lunas</button><button class="btn" id="savePay">Simpan</button></div>
   <h3>Status pesanan</h3>${nx ? `<button class="btn nextb" id="nextSt">Lanjut: ${LABEL[nx]}</button>` : '<p class="muted">Pesanan sudah selesai.</p>'}
   <div class="ctl" style="margin-top:8px"><select id="st" aria-label="Status">${f.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${LABEL[s]}</option>`).join("")}</select><button class="btn ghost" id="saveSt">Atur manual</button></div>
-  <button class="btn ghost nextb" id="print">🖨️ Cetak label pengiriman</button><button class="btn ghost nextb" id="struk">🧾 Lihat struk</button><h3>Chat dengan pelanggan</h3><div id="chat"></div>`;
+  <button class="btn ghost nextb" id="print">🖨️ Cetak label pengiriman</button><button class="btn ghost nextb" id="struk">🧾 Lihat struk</button><button class="btn ghost nextb" id="wa">💬 Kirim update WhatsApp</button><h3>Chat dengan pelanggan</h3><div id="chat"></div>`;
   $("#panel").classList.add("open");
   drawOrders();
   Chat($("#chat"), id, "admin");
@@ -167,6 +169,19 @@ function show(id) {
   if (nx) $("#nextSt").onclick = () => saveOrder(id, { status: nx }, "Status: " + LABEL[nx]);
   $("#print").onclick = () => printLabel(o);
   $("#struk").onclick = () => window.open(`struk.html?id=${o.id}`, "_blank");
+  $("#wa").onclick = () => {
+    const kata = {
+      baru: "sudah kami terima dan akan segera diproses",
+      diproses: "sedang kami proses",
+      dikemas: "sedang dikemas dengan rapi 🎀",
+      siap: "sudah siap diambil di toko 🛍️",
+      diantar: "sedang dalam perjalanan ke alamatmu 🚚",
+      selesai: "sudah selesai. Terima kasih sudah memesan! 🙏",
+    };
+    const sisa = Math.max(0, o.total - o.paid);
+    const text = `Halo ${o.nama}, pesanan ${o.kode} ${kata[o.status] || ""}.${sisa ? `\nSisa pembayaran ${rp(sisa)}.` : ""}\nTerima kasih 🎁`;
+    window.open(`https://wa.me/${o.hp}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  };
 }
 async function saveOrder(id, body, msg) {
   try {

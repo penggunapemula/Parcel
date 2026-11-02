@@ -43,7 +43,10 @@ def notify(text):
             urllib.request.urlopen(f"https://api.telegram.org/bot{config.TG_TOKEN}/sendMessage", data, timeout=10)
         except Exception as exc:
             print("Gagal kirim notifikasi:", exc)
-    threading.Thread(target=send, daemon=True).start()
+    if config.SERVERLESS:  # di serverless, thread bisa mati sebelum terkirim: kirim langsung
+        send()
+    else:
+        threading.Thread(target=send, daemon=True).start()
 
 
 def save_image(file):
@@ -58,14 +61,22 @@ def save_image(file):
         ext = "webp"
     if not ext:
         return None
-    os.makedirs(config.UPLOADS, exist_ok=True)
     name = f"{uuid.uuid4().hex}.{ext}"
+    if config.STORE_DB:  # simpan di database (hosting tanpa penyimpanan tetap, mis. Vercel)
+        from .db import run
+        run("INSERT INTO uploads(name,mime,data) VALUES(?,?,?)", (name, f"image/{'jpeg' if ext == 'jpg' else ext}", data))
+        return name
+    os.makedirs(config.UPLOADS, exist_ok=True)
     with open(os.path.join(config.UPLOADS, name), "wb") as fh:
         fh.write(data)
     return name
 
 
 def delete_image(name):
+    if name and config.STORE_DB:
+        from .db import q
+        q("DELETE FROM uploads WHERE name=?", (os.path.basename(name),))
+        return
     if name:
         try:
             os.remove(os.path.join(config.UPLOADS, os.path.basename(name)))

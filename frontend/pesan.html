@@ -66,6 +66,13 @@
               <div class="seg" id="cats"></div>
               <button type="button" class="btn ghost mini" id="auto">✨ Isi otomatis</button>
             </div>
+            <div class="tpls" id="tpls" aria-label="Template isi parcel">
+              <span class="muted">Mulai cepat:</span>
+              <button type="button" class="chip" data-t="dapur">🍳 Kebutuhan dapur</button>
+              <button type="button" class="chip" data-t="manis">🍪 Manis &amp; camilan</button>
+              <button type="button" class="chip" data-t="bersih">🧼 Bersih rumah</button>
+              <button type="button" class="chip" data-t="all">🎁 Serba ada</button>
+            </div>
             <input id="cari" type="search" placeholder="Cari barang…" aria-label="Cari barang" />
             <div class="meter"><i id="bar"></i></div>
             <p id="meterTxt" class="muted">Pilih paket dulu.</p>
@@ -87,6 +94,7 @@
               <div>
                 <label for="tgl">Dibutuhkan tanggal</label>
                 <input id="tgl" type="date" required />
+                <small class="muted" id="tglInfo"></small>
               </div>
             </div>
 

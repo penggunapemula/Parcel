@@ -646,3 +646,39 @@
   color: var(--mut);
   font-weight: 500;
 }
+
+/* ---------- Template isi & info kuota tanggal ---------- */
+.tpls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tpls .chip {
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.25s var(--spring);
+}
+
+.tpls .chip:hover {
+  background: var(--green-l);
+  transform: translateY(-2px);
+}
+
+#tglInfo {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+#tglInfo.warn {
+  color: var(--ink);
+}
+
+#tglInfo.warn::before {
+  content: "⚠ ";
+  color: var(--gold);
+}

@@ -211,6 +211,14 @@ CREATE TABLE IF NOT EXISTS gallery (
     created  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
+-- Foto unggahan bila disimpan di database (STORAGE=db, dipakai di Vercel / hosting tanpa penyimpanan tetap)
+CREATE TABLE IF NOT EXISTS uploads (
+    name     TEXT PRIMARY KEY,
+    mime     TEXT NOT NULL,
+    data     BLOB NOT NULL,
+    created  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
 CREATE TABLE IF NOT EXISTS settings (
     key    TEXT PRIMARY KEY,
     value  TEXT

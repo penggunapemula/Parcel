@@ -1,13 +1,31 @@
 """Rute pesanan: buat, daftar, update, chat, bukti bayar, ulasan, dan ekspor CSV."""
 import csv, io, json
-from datetime import date
+import time
+from datetime import date, timedelta
 from flask import Blueprint, request, session, jsonify, Response
 from . import config
 from .db import db, q, run
-from .pricing import quote
+from .auth import too_many, _gagal
+from .pricing import quote, setting
 from .utils import err, rupiah, is_admin, admin_only, user_only, notify, save_image
 
 bp = Blueprint("orders", __name__, url_prefix="/api")
+
+def to_int(v, default=0):
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return default
+
+
+def quota_left(tanggal):
+    """Sisa kuota parcel pada satu tanggal; None bila toko tidak membatasi kapasitas harian."""
+    cap = to_int(setting("kapasitas_harian", "0"))
+    if cap <= 0:
+        return None
+    used = q("SELECT COALESCE(SUM(qty),0) n FROM orders WHERE tanggal_acara=?", (tanggal,), True)["n"]
+    return cap - int(used)
+
 
 ORDER_SQL = """SELECT o.*, u.nama, u.hp, u.email,
   (SELECT COUNT(*) FROM chat c WHERE c.order_id=o.id AND c.sender NOT IN (?, 'sys') AND c.dibaca=0) AS unread,
@@ -57,6 +75,13 @@ def validate_order(j):
         return None, None, "Isi tanggal acara atau tanggal parcel dibutuhkan."
     if tgl < date.today():
         return None, None, "Tanggal acara tidak boleh sudah lewat."
+    min_hari = to_int(setting("min_hari_pesan", "0"))
+    if tgl < date.today() + timedelta(days=min_hari):
+        return None, None, f"Pemesanan minimal {min_hari} hari sebelum tanggal parcel dibutuhkan."
+    sisa = quota_left(tgl.isoformat())
+    if sisa is not None and qty > sisa:
+        return None, None, ("Tanggal itu sudah penuh. Pilih tanggal lain." if sisa <= 0
+                            else f"Kuota tanggal itu tersisa {sisa} parcel. Kurangi jumlah atau pilih tanggal lain.")
     marks = ",".join("?" * len(ids)) or "NULL"
     rows = [dict(r) for r in q(f"SELECT * FROM items WHERE aktif=1 AND id IN ({marks})", ids)]
     if not rows or len(rows) != len(set(ids)):
@@ -244,3 +269,32 @@ def export_csv():
                       o["metode"], o["status"], o["alamat"], "; ".join(i["nama"] for i in o["items"])])
     return Response("\ufeff" + buf.getvalue(), mimetype="text/csv",
                     headers={"Content-Disposition": "attachment; filename=pesanan-parcelku.csv"})
+
+
+@bp.get("/availability")
+def availability():
+    """Jadwal untuk form pesan: kapasitas harian, minimal hari pesan, dan jumlah parcel terpakai per tanggal."""
+    rows = q("SELECT tanggal_acara d, SUM(qty) n FROM orders WHERE tanggal_acara>=? GROUP BY tanggal_acara",
+             (date.today().isoformat(),))
+    return jsonify(kapasitas=to_int(setting("kapasitas_harian", "0")), min_hari=to_int(setting("min_hari_pesan", "0")),
+                   terpakai={r["d"]: int(r["n"]) for r in rows})
+
+
+@bp.get("/track")
+def track():
+    """Lacak pesanan tanpa login: kode pesanan + 4 digit terakhir nomor telepon pemesan."""
+    key, recent, blocked = too_many("track")
+    if blocked:
+        return err("Terlalu banyak percobaan. Coba lagi dalam beberapa menit.", 429)
+    kode = (request.args.get("kode") or "").strip().upper()
+    hp4 = "".join(c for c in (request.args.get("hp") or "") if c.isdigit())[-4:]
+    row = q("SELECT o.id,o.kode,o.status,o.metode,o.qty,o.paket,o.tanggal_acara,o.created,o.wadah,u.nama,u.hp "
+            "FROM orders o JOIN users u ON u.id=o.user_id WHERE o.kode=?", (kode,), True)
+    if not row or len(hp4) < 4 or not str(row["hp"]).endswith(hp4):
+        _gagal[key] = recent + [time.time()]
+        return err("Kode pesanan atau 4 digit akhir nomor telepon tidak cocok.", 404)
+    log = q("SELECT status,created FROM status_log WHERE order_id=? ORDER BY id", (row["id"],))
+    return jsonify(kode=row["kode"], status=row["status"], metode=row["metode"], qty=row["qty"], paket=row["paket"],
+                   tanggal_acara=row["tanggal_acara"], created=row["created"], wadah=row["wadah"],
+                   nama=(row["nama"] or "").split(" ")[0],  # hanya nama depan
+                   linimasa=[dict(r) for r in log])

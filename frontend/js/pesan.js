@@ -26,6 +26,7 @@ const S = {
 };
 let ITEMS = [];
 let ADDR = []; // alamat tersimpan pelanggan
+let AV = { kapasitas: 0, min_hari: 0, terpakai: {} }; // jadwal & kuota harian
 let METHODS = []; // metode pembayaran aktif
 let ME = {};
 let stage; // instance ParcelView
@@ -415,6 +416,63 @@ function draw() {
   drawSum();
 }
 
+/* ---------- Jadwal: kuota per tanggal ---------- */
+/** Tampilkan sisa kuota untuk tanggal terpilih. Kembalikan false bila jumlah parcel melebihi sisa. */
+function drawTglInfo() {
+  const box = $("#tglInfo");
+  const day = $("#tgl").value;
+  box.className = "";
+  if (!day || !AV.kapasitas) {
+    box.textContent = "";
+    return true;
+  }
+  const sisa = AV.kapasitas - (AV.terpakai[day] || 0);
+  const qty = Math.max(1, +$("#qty").value || 1);
+  if (sisa <= 0) {
+    box.textContent = "Tanggal ini sudah penuh. Pilih tanggal lain.";
+    box.className = "warn";
+    return false;
+  }
+  if (qty > sisa) {
+    box.textContent = `Sisa kuota tanggal ini ${sisa} parcel, jumlahmu ${qty}. Kurangi atau pilih tanggal lain.`;
+    box.className = "warn";
+    return false;
+  }
+  box.textContent = `Kuota tersedia: ${sisa} parcel`;
+  return true;
+}
+
+/* ---------- Template isi parcel ---------- */
+const TEMPLATES = {
+  dapur: ["Sembako", "Minuman"],
+  manis: ["Kue", "Minuman"],
+  bersih: ["Kebersihan", "Sembako"],
+};
+
+/** Isi parcel dari kategori tertentu (bergiliran antarkategori), lalu lengkapi dengan barang lain sampai budget penuh. */
+function fillTemplate(name) {
+  if (!S.paket) return toast("Pilih paket dulu.");
+  if (name === "all") return autoFill();
+  S.pick.clear();
+  const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+  const cats = TEMPLATES[name].filter((c) => ITEMS.some((i) => i.kategori === c));
+  const queues = cats.map((c) => shuffle(ITEMS.filter((i) => i.kategori === c)));
+  const rest = shuffle(ITEMS.filter((i) => !cats.includes(i.kategori)));
+  for (let added = true; added;) {
+    added = false;
+    for (const queue of [...queues, rest]) {
+      const item = queue.find((x) => !S.pick.has(x.id) && used() + x.harga <= S.paket);
+      if (item) {
+        S.pick.add(item.id);
+        added = true;
+        if (queue === rest) break; // barang "lain" hanya pelengkap, bukan prioritas
+      }
+    }
+  }
+  draw();
+  toast("Isi parcel disusun dari template. Silakan ubah sesukamu.");
+}
+
 /* ---------- Aksi ---------- */
 function autoFill() {
   if (!S.paket) return toast("Pilih paket dulu.");
@@ -462,6 +520,7 @@ async function submitOrder() {
   if (!S.paket) return toast("Pilih paket dulu.");
   if (!S.pick.size) return toast("Pilih minimal satu isi parcel.");
   if (!$("#tgl").value) return toast("Isi tanggal parcel dibutuhkan.");
+  if (!drawTglInfo()) return toast("Kuota tanggal itu tidak cukup. Ganti tanggal atau kurangi jumlah.");
   if (!S.bayar) return toast("Pilih metode pembayaran.");
   if (val("m") !== "ambil" && S.addrId === null && $("#alamat").value.trim().length < 8)
     return toast("Isi alamat pengantaran dengan lengkap.");
@@ -619,10 +678,15 @@ $$("#metode input").forEach((radio) => {
     refreshQuote();
   };
 });
-["#alamat", "#tgl"].forEach((s) => ($(s).oninput = drawSum));
+$("#alamat").oninput = drawSum;
+$("#tgl").oninput = () => {
+  drawSum();
+  drawTglInfo();
+};
 ["#kartu", "#kUntuk", "#kDari"].forEach((id) => ($(id).oninput = drawKartu));
 $("#qty").oninput = () => {
   drawSum();
+  drawTglInfo();
   refreshQuote();
 };
 $("#vbtn").onclick = () => {
@@ -635,6 +699,7 @@ $("#cari").oninput = (e) => {
   drawItems();
 };
 $("#auto").onclick = autoFill;
+$$("#tpls [data-t]").forEach((b) => (b.onclick = () => fillTemplate(b.dataset.t)));
 $("#gps").onclick = getLocation;
 $("#kirim").onclick = submitOrder;
 $("#kirim2").onclick = submitOrder;
@@ -661,10 +726,14 @@ $("#sideClose").onclick = $("#scrim").onclick = () => toggleSide(false);
   bindDrop();
 
   // Tanggal: minimal hari ini, default 3 hari lagi
+  AV = await api("/availability").catch(() => AV);
+  const earliest = new Date();
+  earliest.setDate(earliest.getDate() + (AV.min_hari || 0));
   const soon = new Date();
-  soon.setDate(soon.getDate() + 3);
-  $("#tgl").min = new Date().toLocaleDateString("sv-SE");
+  soon.setDate(soon.getDate() + Math.max(3, AV.min_hari || 0));
+  $("#tgl").min = earliest.toLocaleDateString("sv-SE");
   $("#tgl").value = soon.toLocaleDateString("sv-SE");
+  drawTglInfo();
 
   // Parameter dari tautan (?paket=25000&wadah=bulat&ulang=12)
   const qs = new URLSearchParams(location.search);

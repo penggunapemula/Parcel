@@ -1,0 +1,8 @@
+# Tidak perlu ikut ke Vercel (database lokal, unggahan lokal, skrip lokal)
+parcelku.db
+uploads/
+.env
+.secret_key
+MULAI-MAC-LINUX.sh
+MULAI-WINDOWS.bat
+__pycache__/
