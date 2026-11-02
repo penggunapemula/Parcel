@@ -1,3 +1,4 @@
+import os
 """Pabrik aplikasi Flask Parcelku."""
 import time
 import traceback
@@ -35,6 +36,23 @@ def create_app():
                 abort(404)
             return send_file(io.BytesIO(row["data"]), mimetype=row["mime"], max_age=86400)
         return send_from_directory(config.UPLOADS, name, max_age=86400)
+
+    @app.get("/api/health")
+    def health():
+        """Pemeriksaan cepat untuk pemilik situs: mesin database, status koneksi, dan folder tampilan."""
+        return {"status": "ok" if state["error"] is None else "database-error", "engine": config.DB_ENGINE,
+                "serverless": config.SERVERLESS, "frontend_ada": os.path.isdir(config.FRONTEND),
+                "beranda_ada": os.path.exists(os.path.join(config.FRONTEND, "beranda.html")),
+                "path_terbaca": request.path}
+
+    @app.get("/api/index")
+    def entry_diagnostic():
+        """Hanya tampil bila alamat asli tidak bisa dipulihkan (lihat api/index.py): bantu diagnosis."""
+        return {"error": "Alamat asli tidak terbaca oleh server. Kirim isi halaman ini ke pengembang.",
+                "path": request.path, "query": request.query_string.decode(),
+                "x_now_route_matches": request.headers.get("x-now-route-matches"),
+                "x_matched_path": request.headers.get("x-matched-path"),
+                "x_forwarded_uri": request.headers.get("x-forwarded-uri")}, 404
 
     # ---- Bila database belum tersambung, tampilkan penjelasan (bukan error 500 yang membingungkan) ----
     state = {"error": None, "tried": 0.0}
