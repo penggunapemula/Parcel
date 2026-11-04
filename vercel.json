@@ -1,26 +1,7 @@
-
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "public",
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "{server,database}/**",
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/beranda.html",
-      "destination": "/masuk.html",
-      "destination": "/pesan.html",
-      "destination": "/admin.html",
-      "destination": "/akun.html",
-      "destination": "/pesanan.html",
-      "destination": "/struk.html",
-      "destination": "/lacak.html",
-      "destination": "/404.html",
-    },
     {
       "source": "/api/:path*",
       "destination": "/api/index?__path=/api/:path*"
@@ -31,3 +12,4 @@
     }
   ]
 }
+
