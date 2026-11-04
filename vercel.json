@@ -11,7 +11,15 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/beranda.html"
+      "destination": "/beranda.html",
+      "destination": "/masuk.html",
+      "destination": "/pesan.html",
+      "destination": "/admin.html",
+      "destination": "/akun.html",
+      "destination": "/pesanan.html",
+      "destination": "/struk.html",
+      "destination": "/lacak.html",
+      "destination": "/404.html",
     },
     {
       "source": "/api/:path*",
