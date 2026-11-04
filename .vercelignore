@@ -1,10 +1,15 @@
 {
   "version": 2,
+  "outputDirectory": "public",
   "functions": {
     "api/index.py": {
-      "includeFiles": "{frontend,database}/**",
+      "includeFiles": "{server,database}/**",
       "maxDuration": 30
     }
   },
-  "rewrites": [{ "source": "/:path*", "destination": "/api/index?__path=/:path*" }]
+  "rewrites": [
+    { "source": "/", "destination": "/beranda.html" },
+    { "source": "/api/:path*", "destination": "/api/index?__path=/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "/api/index?__path=/uploads/:path*" }
+  ]
 }

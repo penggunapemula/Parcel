@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#1f8a4c" />
+    <title>Sedang offline - Parcelku</title>
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 24px;
+        background: linear-gradient(180deg, #fff, #d6f0df);
+        color: #0f3d26;
+        font-family: system-ui, sans-serif;
+        text-align: center;
+      }
+
+      .box {
+        max-width: 380px;
+      }
+
+      .em {
+        font-size: 3.4rem;
+      }
+
+      h1 {
+        margin: 8px 0;
+        font-size: 1.7rem;
+      }
+
+      p {
+        margin: 0 0 22px;
+        color: rgba(15, 61, 38, 0.66);
+        line-height: 1.6;
+      }
+
+      button {
+        padding: 14px 28px;
+        border: 0;
+        border-radius: 99px;
+        background: #1f8a4c;
+        color: #fff;
+        font:
+          700 1rem system-ui,
+          sans-serif;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="em">📡</div>
+      <h1>Kamu sedang offline</h1>
+      <p>
+        Sambungan internet terputus. Periksa koneksimu, lalu coba lagi. Halaman yang pernah dibuka tetap bisa
+        dilihat.
+      </p>
+      <button onclick="location.reload()">Coba lagi</button>
+    </div>
+  </body>
+</html>

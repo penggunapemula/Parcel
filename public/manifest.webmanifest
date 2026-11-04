@@ -1,0 +1,32 @@
+{
+  "id": "/beranda.html",
+  "name": "Parcelku - Parcel Seserahan Custom",
+  "short_name": "Parcelku",
+  "description": "Susun parcel seserahan sendiri: isi, wadah, pita, dan kartu ucapan.",
+  "lang": "id",
+  "start_url": "/beranda.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f8a4c",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Buat Parcel", "url": "/pesan.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    {
+      "name": "Lacak Pesanan",
+      "url": "/lacak.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pesanan Saya",
+      "url": "/pesanan.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

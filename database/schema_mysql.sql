@@ -64,6 +64,24 @@ CREATE TABLE IF NOT EXISTS items (
     INDEX idx_items_kategori (kategori, aktif)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS saved_designs (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    user_id      INT NOT NULL,
+    nama         VARCHAR(60) NOT NULL,
+    paket        INT NOT NULL,
+    items        TEXT NOT NULL,                          -- daftar id barang (JSON)
+    wadah        VARCHAR(10) NOT NULL DEFAULT 'nampan',
+    bungkus      VARCHAR(10) NOT NULL DEFAULT 'pink',
+    kartu        TEXT NULL,
+    kartu_untuk  VARCHAR(40) NULL,
+    kartu_dari   VARCHAR(40) NULL,
+    kartu_gaya   VARCHAR(10) NOT NULL DEFAULT 'elegan',
+    kartu_tema   VARCHAR(10) NOT NULL DEFAULT 'krem',
+    created      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_designs_user (user_id),
+    CONSTRAINT fk_designs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS payment_methods (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     kode        VARCHAR(30)  NOT NULL UNIQUE,              -- qris, transfer, cash, dana, ...

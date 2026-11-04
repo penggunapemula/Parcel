@@ -1,7 +1,7 @@
-#!/bin/bash
-cd "$(dirname "$0")"
+@echo off
+title Parcelku
+cd /d "%~dp0"
 pip install -r requirements.txt
-# export TELEGRAM_BOT_TOKEN="isi_token"
-# export TELEGRAM_CHAT_ID="isi_chat_id"
-# export ADMIN_PASSWORD="kata_sandi_kuat"
-python3 app.py
+start http://localhost:5000
+python app.py
+pause

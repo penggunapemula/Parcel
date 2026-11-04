@@ -1,0 +1,232 @@
+/* ==========================================================================
+   AKUN — profil, daftar alamat (kartu), form alamat, keamanan
+   ========================================================================== */
+.me-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.me-head > div:nth-child(2) {
+  flex: 1;
+  min-width: 180px;
+}
+
+.me-head h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  background: var(--grad);
+  color: var(--white);
+  font: 800 1.7rem var(--font-head);
+  text-transform: uppercase;
+}
+
+.pane {
+  margin-top: 20px;
+  animation: rise 0.5s var(--ease) both;
+}
+
+.pane h2 {
+  margin-bottom: 6px;
+  font-size: 1.35rem;
+}
+
+.pane form .btn {
+  margin-top: 12px;
+}
+
+.pane-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+hr {
+  margin: 24px 0;
+  border: 0;
+  border-top: 1px dashed var(--line);
+}
+
+/* ---------- Kartu alamat ---------- */
+.addr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.addr {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  transition:
+    transform 0.3s var(--spring),
+    box-shadow 0.3s;
+}
+
+.addr:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-lg);
+}
+
+.addr.utama {
+  border: 2px solid var(--green);
+}
+
+.addr-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.addr-label {
+  font-weight: 800;
+}
+
+.addr b {
+  font-weight: 700;
+}
+
+.addr p {
+  flex: 1;
+  color: var(--mut);
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+.addr small a {
+  font-weight: 600;
+}
+
+.addr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 36px 20px;
+  border: 2px dashed var(--line);
+  border-radius: var(--r);
+  text-align: center;
+}
+
+.empty .big {
+  font-size: 2.6rem;
+}
+
+/* ---------- Form alamat ---------- */
+.addr-form {
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.addr-form h2 {
+  margin-bottom: 4px;
+}
+
+.addr-form #aLabel {
+  margin-top: 8px;
+}
+
+.addr-form .row2 {
+  gap: 10px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Desainku ---------- */
+.design-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.design {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  transition:
+    transform 0.3s var(--spring),
+    box-shadow 0.3s;
+}
+
+.design:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-lg);
+}
+
+.design h3 {
+  font-size: 1.05rem;
+}
+
+.design .meta {
+  color: var(--mut);
+  font-size: 0.82rem;
+}
+
+.design .pv {
+  max-width: 190px;
+  margin: 0 auto;
+}
+
+.design .chips {
+  justify-content: center;
+  margin: 4px 0;
+}
+
+.design .addr-actions {
+  margin-top: auto;
+}

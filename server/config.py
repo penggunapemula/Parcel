@@ -46,7 +46,7 @@ def _secret_key():
         seed = "|".join([os.getenv("ADMIN_PASSWORD", ""), os.getenv("MYSQL_PASSWORD", ""), os.getenv("MYSQL_HOST", ""), "parcelku"])
         return hashlib.sha256(seed.encode()).hexdigest()
 
-FRONTEND = os.path.join(BASE, "frontend")
+FRONTEND = os.path.join(BASE, "public")  # HTML/CSS/JS/gambar; di Vercel dilayani langsung oleh CDN
 UPLOADS = os.path.join(BASE, "uploads")
 DB_PATH = os.getenv("DB_PATH", "/tmp/parcelku.db" if SERVERLESS else os.path.join(BASE, "parcelku.db"))
 

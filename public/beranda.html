@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#1f8a4c" />
+    <meta
+      name="description"
+      content="Parcel seserahan custom untuk tamu undangan. Pilih isi, wadah, pita, dan kartu ucapan. Bisa COD."
+    />
+    <title>Parcelku - Parcel Seserahan Custom</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Dancing+Script:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/shell.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/parcel-view.css" />
+    <link rel="stylesheet" href="css/beranda.css" />
+  </head>
+
+  <body>
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="progress" id="prog"></div>
+
+    <!-- Navigasi: isi menu diisi oleh js/shell.js -->
+    <nav class="navbar" id="navbar" aria-label="Navigasi utama">
+      <a class="logo" href="beranda.html">
+        <span class="mark">🎁</span><span class="brand-name">Parcelku</span>
+      </a>
+      <ul class="nav-links" id="menu"></ul>
+    </nav>
+    <nav class="tabbar" id="tabbar" aria-label="Menu utama"></nav>
+
+    <main>
+      <!-- ===== HERO ===== -->
+      <section class="hero wrap">
+        <span class="deco-flower" aria-hidden="true"></span>
+        <div class="hero-grid">
+          <div class="hero-text">
+            <span class="pill" id="tagline">Parcel seserahan • bisa COD</span>
+            <h1>
+              Seserahan untuk tamu,
+              <em>isinya kamu yang pilih.</em>
+            </h1>
+            <p class="lead">
+              Parcel rapi siap kirim mulai Rp15.000. Pilih isi, wadah, warna pita, dan kartu ucapan sendiri,
+              lalu lihat hasil jadinya sebelum memesan.
+            </p>
+            <div class="cta">
+              <a class="btn big" href="pesan.html">Buat parcel sekarang</a>
+              <a class="btn big ghost" href="#coba">Coba susun dulu</a>
+            </div>
+            <div class="facts">
+              <div><b data-count="3">3</b><span>pilihan paket</span></div>
+              <div><b id="fItems" data-count="16" data-suffix="+">16+</b><span>isi parcel</span></div>
+              <div><b id="fRate">COD</b><span id="fRateL">dengan lokasi</span></div>
+            </div>
+          </div>
+
+          <div class="hero-vis" id="heroVis">
+            <img
+              class="ph p1"
+              src="img/parcel-nampan.jpg"
+              alt="Parcel nampan hijau"
+              data-zoom="img/parcel-nampan.jpg"
+            />
+            <img
+              class="ph p2"
+              src="img/parcel-keranjang-2.jpg"
+              alt="Parcel keranjang bulat"
+              data-zoom="img/parcel-keranjang-2.jpg"
+            />
+            <img
+              class="ph p3"
+              src="img/parcel-keranjang-1.jpg"
+              alt="Parcel keranjang berisi wafer dan kopi"
+              data-zoom="img/parcel-keranjang-1.jpg"
+            />
+            <span class="fchip f1">🎀 Pita pilihanmu</span>
+            <span class="fchip f2">🚚 Bisa diantar</span>
+            <span class="fchip f3">✨ Lihat hasil jadinya</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DEMO SUSUN PARCEL ===== -->
+      <section class="wrap sec rv" id="coba">
+        <span class="eyebrow">Coba langsung</span>
+        <h2>Coba susun parcelmu di sini</h2>
+        <p class="muted">
+          Centang barang dan lihat langsung masuk ke wadahnya. Saat budget penuh, parcel otomatis dibungkus.
+        </p>
+
+        <div class="demo card">
+          <div class="demo-left">
+            <div class="demo-ctrl">
+              <div>
+                <small class="muted">Paket</small>
+                <div class="seg" id="dPaket"></div>
+              </div>
+              <div>
+                <small class="muted">Wadah</small>
+                <div class="seg" id="dWadah"></div>
+              </div>
+              <div>
+                <small class="muted">Pita</small>
+                <div class="seg" id="dPita"></div>
+              </div>
+            </div>
+            <div class="demo-tools">
+              <input
+                id="dKartu"
+                maxlength="40"
+                placeholder="Tulis kartu ucapan, lihat hasilnya…"
+                aria-label="Kartu ucapan"
+              />
+              <button type="button" class="btn ghost mini" id="dAuto">✨ Isi otomatis</button>
+            </div>
+            <div class="ditems" id="dItems"></div>
+          </div>
+
+          <div class="demo-right">
+            <div id="dStage"></div>
+            <div class="meter"><i id="dBar"></i></div>
+            <p id="dTxt" class="muted"></p>
+            <div class="demo-actions">
+              <button type="button" class="btn ghost mini" id="dReset">Kosongkan</button>
+              <a class="btn" id="dGo" href="pesan.html">Pesan parcel ini</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PROSES PEMBUATAN (animasi otomatis) ===== -->
+      <section class="wrap sec rv" id="proses">
+        <span class="eyebrow">Lihat prosesnya</span>
+        <h2>Dari wadah kosong jadi parcel cantik</h2>
+        <p class="muted">Empat langkah singkat. Ketuk langkahnya untuk melompat, atau putar ulang.</p>
+
+        <div class="proses card">
+          <ol class="psteps" id="pSteps">
+            <li>
+              <button type="button" data-s="0">
+                <i>1</i><b>Pilih wadah</b><small>Nampan atau keranjang</small>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-s="1">
+                <i>2</i><b>Isi barangnya</b><small>Sesuai budget paket</small>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-s="2">
+                <i>3</i><b>Bungkus &amp; pita</b><small>Plastik, bunga, pita</small>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-s="3">
+                <i>4</i><b>Kartu ucapan</b><small>Pesan untuk tamu</small>
+              </button>
+            </li>
+          </ol>
+          <div class="pstage">
+            <div id="pStage"></div>
+            <button type="button" class="btn ghost mini" id="pPlay">↻ Putar ulang</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== GALERI PARCEL JADI ===== -->
+      <section class="wrap sec rv" id="galeri">
+        <span class="eyebrow">Hasil nyata</span>
+        <h2>Contoh parcel yang sudah jadi</h2>
+        <p class="muted">Hasil nyata dari pesanan pelanggan. Ketuk foto untuk memperbesar.</p>
+
+        <div class="gal" id="galStatic">
+          <figure data-zoom="img/parcel-nampan.jpg">
+            <img
+              src="img/parcel-nampan.jpg"
+              alt="Parcel nampan hijau berisi dupa jasmine dengan pita hijau"
+              loading="lazy"
+            />
+            <figcaption>
+              <b>Nampan hijau emas</b><span>Dupa jasmine, pita hijau, kartu ucapan</span>
+            </figcaption>
+          </figure>
+          <figure data-zoom="img/parcel-keranjang-1.jpg">
+            <img
+              src="img/parcel-keranjang-1.jpg"
+              alt="Parcel keranjang bulat berisi wafer, teh gelas, kopi, dan mie"
+              loading="lazy"
+            />
+            <figcaption><b>Keranjang bulat</b><span>Wafer, teh gelas, kopi, mie</span></figcaption>
+          </figure>
+          <figure data-zoom="img/parcel-keranjang-2.jpg">
+            <img
+              src="img/parcel-keranjang-2.jpg"
+              alt="Parcel keranjang bulat berisi wafer dan sabun cuci piring"
+              loading="lazy"
+            />
+            <figcaption><b>Keranjang bulat</b><span>Wafer, sabun cuci piring, camilan</span></figcaption>
+          </figure>
+        </div>
+
+        <!-- Foto tambahan yang diunggah admin -->
+        <div class="gal" id="gal"></div>
+      </section>
+
+      <!-- ===== KEUNGGULAN ===== -->
+      <section class="wrap sec">
+        <span class="eyebrow">Kenapa Parcelku</span>
+        <h2 class="rv">Dibuat supaya pesan jadi mudah</h2>
+        <div class="bento">
+          <div class="card b1 rv">
+            <span class="em">🎁</span>
+            <h3>Isi, wadah, pita, dan kartu sesukamu</h3>
+            <p class="muted">
+              Barang yang tidak muat budget otomatis dikunci. Pilih nampan atau keranjang, warna pita, dan
+              tulis ucapan untuk tamu.
+            </p>
+          </div>
+          <div class="card b2 rv">
+            <span class="em">📦</span>
+            <h3>Pantau tiap tahap</h3>
+            <div class="mt">
+              <span class="d on"></span><span class="d on"></span><span class="d now"></span
+              ><span class="d"></span><span class="d"></span>
+            </div>
+            <p class="muted">Diproses, dikemas, lalu siap diambil atau diantar.</p>
+          </div>
+          <div class="card b3 rv">
+            <span class="em">📍</span>
+            <h3>COD dengan lokasi</h3>
+            <p class="muted">Bagikan lokasi dari HP, admin menemukan rumahmu lebih cepat.</p>
+          </div>
+          <div class="card b4 rv">
+            <span class="em">💬</span>
+            <h3>Chat langsung dengan admin</h3>
+            <div class="bub">
+              <span class="msg them">Halo, lokasinya sudah kami terima ya 👍</span>
+              <span class="msg me">Siap, ditunggu kak!</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAKET ===== -->
+      <section class="wrap sec rv" id="paket">
+        <span class="eyebrow">Paket</span>
+        <h2>Pilih paket sesuai budget</h2>
+        <p class="muted">Isi parcel bebas kamu atur sampai nilai paket terpenuhi.</p>
+        <div class="pk-grid">
+          <a class="card tilt" href="pesan.html?paket=15000">
+            <span class="em">🎀</span>
+            <h3>Hemat</h3>
+            <b>Rp15.000</b>
+            <p class="muted">3–4 barang pilihan, pas untuk tamu umum.</p>
+          </a>
+          <a class="card tilt hot" href="pesan.html?paket=25000">
+            <span class="badge b-new">Paling dipilih</span>
+            <span class="em">🎁</span>
+            <h3>Favorit</h3>
+            <b>Rp25.000</b>
+            <p class="muted">5–7 barang, campuran kebutuhan dapur dan kue.</p>
+          </a>
+          <a class="card tilt" href="pesan.html?paket=35000">
+            <span class="em">👑</span>
+            <h3>Premium</h3>
+            <b>Rp35.000</b>
+            <p class="muted">Isi lebih lengkap untuk keluarga dan tamu penting.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- ===== CARA PESAN ===== -->
+      <section class="wrap sec rv">
+        <span class="eyebrow">Alur pesan</span>
+        <h2>Cara pesan</h2>
+        <ol class="how">
+          <li class="card"><b>Masuk</b>Isi nama dan nomor WhatsApp.</li>
+          <li class="card"><b>Susun parcel</b>Pilih paket, isi, wadah, pita, dan tanggal acara.</li>
+          <li class="card"><b>Pilih pengambilan</b>Ambil di toko, antar, atau COD dengan lokasi.</li>
+          <li class="card"><b>Bayar &amp; kirim bukti</b>DP atau lunas, unggah bukti transfer.</li>
+          <li class="card"><b>Pantau</b>Lihat status dan chat admin kapan saja.</li>
+        </ol>
+      </section>
+
+      <!-- ===== ULASAN (tampil bila sudah ada) ===== -->
+      <section class="wrap sec rv" id="ulasan" hidden>
+        <h2>Kata pelanggan</h2>
+        <p class="muted" id="rvSum"></p>
+        <div class="rvs" id="rvs"></div>
+      </section>
+
+      <!-- ===== FAQ ===== -->
+      <section class="wrap sec rv">
+        <span class="eyebrow">FAQ</span>
+        <h2>Pertanyaan yang sering muncul</h2>
+        <div class="faq">
+          <details class="card">
+            <summary>Berapa DP yang harus dibayar?</summary>
+            <p class="muted">
+              DP 50% dari total pesanan, atau bayar lunas langsung. Unggah bukti transfer di halaman Pesanan
+              Saya, admin mencatat nominalnya.
+            </p>
+          </details>
+          <details class="card">
+            <summary>Bagaimana cara kerja COD?</summary>
+            <p class="muted">
+              Pilih COD, isi alamat, lalu bagikan lokasimu lewat tombol GPS. Admin mengonfirmasi lokasi dan
+              jam antar lewat chat, parcel dibayar di tempat saat tiba.
+            </p>
+          </details>
+          <details class="card">
+            <summary>Apakah bisa ambil sendiri ke toko?</summary>
+            <p class="muted">
+              Bisa. Pilih "Ambil ke toko", status berubah menjadi "Siap Diambil" saat parcel selesai dikemas.
+            </p>
+          </details>
+          <details class="card">
+            <summary>Bisa ubah isi parcel setelah memesan?</summary>
+            <p class="muted">
+              Selama masih Pesanan Diterima atau Diproses, hubungi admin lewat chat di halaman Pesanan Saya.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <!-- ===== AJAKAN AKHIR ===== -->
+      <section class="wrap sec rv">
+        <div class="band card">
+          <div>
+            <h2>Siap menyusun parcelmu?</h2>
+            <p>Cukup beberapa klik, admin langsung menerima pesananmu.</p>
+          </div>
+          <a class="btn big" href="pesan.html">Mulai pesan</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="fg">
+        <div>
+          <a class="logo" href="beranda.html">
+            <span class="mark">🎁</span><span class="brand-name">Parcelku</span>
+          </a>
+          <p class="muted" id="fTag"></p>
+        </div>
+        <div>
+          <b>Menu</b>
+          <a href="pesan.html">Buat parcel</a>
+          <a href="pesanan.html">Pesanan saya</a>
+          <a href="lacak.html">Lacak pesanan</a>
+          <a href="#" id="pwaInstall" hidden>📲 Pasang aplikasi</a>
+          <a href="#galeri">Galeri</a>
+        </div>
+        <div>
+          <b>Info toko</b>
+          <span id="fJam"></span>
+          <span id="fAlamat"></span>
+          <a id="fWa" href="#">Chat WhatsApp</a>
+        </div>
+      </div>
+      <p class="copy">© Parcelku · Dibuat dengan sepenuh hati</p>
+    </footer>
+
+    <script src="js/core.js"></script>
+    <script src="js/shell.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/parcel-view.js"></script>
+    <script src="js/fx.js"></script>
+    <script src="js/beranda.js"></script>
+  </body>
+</html>

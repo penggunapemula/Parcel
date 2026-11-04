@@ -5,7 +5,7 @@ import traceback
 from flask import Flask, request, send_from_directory, send_file, abort, Response
 from . import config
 from .db import init_db, close_db
-from . import auth, catalog, orders, vouchers, addresses, payments
+from . import auth, catalog, orders, vouchers, addresses, payments, designs
 
 
 def create_app():
@@ -19,7 +19,7 @@ def create_app():
     )
     app.config["MAX_CONTENT_LENGTH"] = config.MAX_UPLOAD + 1024 * 64
     app.teardown_appcontext(close_db)
-    for module in (auth, catalog, orders, vouchers, addresses, payments):
+    for module in (auth, catalog, orders, vouchers, addresses, payments, designs):
         app.register_blueprint(module.bp)
 
     @app.get("/")

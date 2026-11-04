@@ -71,6 +71,23 @@ CREATE TABLE IF NOT EXISTS items (                     -- isi parcel yang bisa d
     foto      TEXT                                     -- nama berkas di folder uploads/
 );
 
+-- Desain parcel favorit yang disimpan pelanggan ("Desainku"), bisa dipakai lagi kapan saja
+CREATE TABLE IF NOT EXISTS saved_designs (
+    id           INTEGER PRIMARY KEY,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    nama         TEXT    NOT NULL,
+    paket        INTEGER NOT NULL,
+    items        TEXT    NOT NULL DEFAULT '[]',        -- daftar id barang (JSON)
+    wadah        TEXT    NOT NULL DEFAULT 'nampan',
+    bungkus      TEXT    NOT NULL DEFAULT 'pink',
+    kartu        TEXT,
+    kartu_untuk  TEXT,
+    kartu_dari   TEXT,
+    kartu_gaya   TEXT    NOT NULL DEFAULT 'elegan',
+    kartu_tema   TEXT    NOT NULL DEFAULT 'krem',
+    created      TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
 -- Metode pembayaran yang bisa dipilih pelanggan (dikelola admin)
 CREATE TABLE IF NOT EXISTS payment_methods (
     id          INTEGER PRIMARY KEY,
@@ -232,6 +249,7 @@ CREATE TABLE IF NOT EXISTS settings (
 -- ---------- Index untuk pencarian & laporan ----------
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_addr_user        ON addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_designs_user     ON saved_designs(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user      ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status    ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created   ON orders(created);

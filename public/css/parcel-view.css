@@ -1,0 +1,373 @@
+/* ==========================================================================
+   PARCEL VIEW — wadah, isi, dan hasil jadi (dibungkus plastik + bunga + pita)
+   ========================================================================== */
+.pv {
+  --c: #e79bb0; /* warna pita, diatur lewat JS */
+  width: 100%;
+}
+
+.pv-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 6;
+}
+
+/* ---------- Wadah ---------- */
+.pv-wadah {
+  position: absolute;
+  right: 6%;
+  bottom: 2%;
+  left: 6%;
+  aspect-ratio: 1;
+  container-type: size;
+  border: 7px solid var(--gold);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(145deg, #2aa35c, #176b3a);
+  box-shadow:
+    inset 0 6px 18px rgba(0, 0, 0, 0.22),
+    0 18px 30px rgba(15, 61, 38, 0.22);
+  transition: border-radius 0.5s var(--ease);
+}
+
+/* Nampan persegi bersudut (seperti nampan hijau emas) */
+.pv[data-wadah="nampan"] .pv-wadah {
+  border-radius: 14px;
+}
+
+/* Keranjang bulat bermotif bunga */
+.pv[data-wadah="bulat"] .pv-wadah {
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 14px, rgba(201, 162, 75, 0.22) 14px 16px),
+    linear-gradient(145deg, #176b3a, #0f3d26);
+}
+
+.pv-empty {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12%;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+
+.pv.has-items .pv-empty {
+  opacity: 0;
+}
+
+/* ---------- Isi ---------- */
+.pv-grid {
+  --k: 2;
+  position: absolute;
+  inset: 9%;
+  display: grid;
+  grid-template-columns: repeat(var(--k), 1fr);
+  align-content: center;
+  gap: 5%;
+}
+
+.pv-tok {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 14%;
+  background: var(--white);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transform: rotate(var(--rot, 0deg));
+  animation: tokIn 0.55s var(--spring) both;
+}
+
+.pv-tok img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pv-emo {
+  font-size: calc(100cqw / var(--k) * 0.5);
+  line-height: 1;
+}
+
+.pv-tok small {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1px 2px;
+  overflow: hidden;
+  background: rgba(15, 61, 38, 0.78);
+  color: var(--white);
+  font-size: 0.6rem;
+  line-height: 1.3;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pv-grid[style*="--k: 4"] .pv-tok small {
+  display: none;
+}
+
+.pv-tok.out {
+  animation: tokOut 0.26s ease-in both;
+}
+
+@keyframes tokIn {
+  from {
+    opacity: 0;
+    transform: translateY(-90px) scale(0.4) rotate(-20deg);
+  }
+}
+
+@keyframes tokOut {
+  to {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+/* ---------- Pembungkus (muncul saat budget penuh) ---------- */
+.pv-fan,
+.pv-film,
+.pv-deco {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.7s var(--spring);
+}
+
+/* Kipas plastik bening di atas wadah */
+.pv-fan {
+  position: absolute;
+  top: 0;
+  right: 18%;
+  left: 18%;
+  height: 31%;
+  background:
+    repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.95) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, rgba(31, 138, 76, 0.12), rgba(255, 255, 255, 0.85));
+  clip-path: polygon(0 0, 100% 0, 66% 100%, 34% 100%);
+  transform: translateY(20px) scaleY(0.6);
+  transform-origin: bottom;
+}
+
+/* Plastik bening yang menutupi wadah */
+.pv-film {
+  position: absolute;
+  right: 3%;
+  bottom: 0;
+  left: 3%;
+  height: 80%;
+  border-radius: 20px;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0.35)
+  );
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+}
+
+.pv[data-wadah="bulat"] .pv-film {
+  border-radius: 46%;
+}
+
+.pv-deco {
+  position: absolute;
+  inset: 0;
+}
+
+.pv-flower {
+  position: absolute;
+  top: 13%;
+  left: 50%;
+  z-index: 3;
+  width: 20%;
+  filter: drop-shadow(0 4px 6px rgba(15, 61, 38, 0.3));
+  transform: translateX(-50%) rotate(-12deg);
+}
+
+/* Pita: dua kuping + simpul + dua ekor, memakai warna pilihan pelanggan */
+.pv-bow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  z-index: 2;
+  width: 34%;
+  height: 18%;
+  transform: translateX(-50%);
+}
+
+.pv-bow i {
+  position: absolute;
+  top: 6%;
+  width: 40%;
+  height: 46%;
+  border-radius: 50% 50% 50% 8%;
+  background: var(--c);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+.pv-bow i:first-child {
+  left: 8%;
+  transform: rotate(-18deg);
+}
+
+.pv-bow i:nth-child(2) {
+  right: 8%;
+  transform: scaleX(-1) rotate(-18deg);
+}
+
+.pv-bow b {
+  position: absolute;
+  top: 18%;
+  left: 42%;
+  width: 16%;
+  height: 26%;
+  border-radius: 4px;
+  background: var(--c);
+  filter: brightness(0.88);
+}
+
+.pv-bow u {
+  position: absolute;
+  top: 38%;
+  width: 14%;
+  height: 62%;
+  background: var(--c);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18));
+}
+
+.pv-bow u:nth-of-type(1) {
+  left: 30%;
+  transform: rotate(10deg);
+}
+
+.pv-bow u:nth-of-type(2) {
+  right: 30%;
+  transform: rotate(-10deg);
+}
+
+/* Kartu ucapan kecil */
+.pv-tag {
+  position: absolute;
+  top: 46%;
+  right: 12%;
+  z-index: 3;
+  width: 28%;
+  padding: 6px 6px 7px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: #fffdf6;
+  box-shadow: 0 6px 14px rgba(15, 61, 38, 0.25);
+  font-size: 0.62rem;
+  line-height: 1.25;
+  text-align: center;
+  transform: rotate(7deg) scale(0.6);
+  transition: transform 0.7s var(--spring);
+}
+
+.pv-tag small {
+  display: block;
+  color: var(--gold);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pv-tag b {
+  display: block;
+  overflow: hidden;
+  font: 700 0.9rem var(--font-card-tulisan);
+  text-overflow: ellipsis;
+}
+
+/* Keadaan jadi */
+.pv.done .pv-fan {
+  opacity: 1;
+  transform: none;
+}
+
+.pv.done .pv-film,
+.pv.done .pv-deco {
+  opacity: 1;
+}
+
+.pv.done .pv-tag {
+  transform: rotate(7deg) scale(1);
+}
+
+.pv.done .pv-wadah {
+  box-shadow:
+    inset 0 6px 18px rgba(0, 0, 0, 0.22),
+    0 0 0 5px rgba(201, 162, 75, 0.25),
+    0 22px 40px rgba(15, 61, 38, 0.3);
+}
+
+/* ---------- Catatan di bawah wadah ---------- */
+.pv-note {
+  margin-top: 10px;
+  color: var(--mut);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.pv.done .pv-note {
+  color: var(--green-d);
+  font-weight: 700;
+}
+
+/* ---------- Barang bisa diklik untuk dikeluarkan ---------- */
+.pv-tok.removable {
+  cursor: pointer;
+  transition: transform 0.25s var(--spring);
+}
+
+.pv-tok.removable:hover {
+  z-index: 2;
+  transform: rotate(0deg) scale(1.08);
+}
+
+.pv-tok.removable::before {
+  content: "✕";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 0.65rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.pv-tok.removable:hover::before {
+  opacity: 1;
+}
+
+/* Area tujuan saat barang diseret ke wadah */
+.pv.drop .pv-wadah {
+  outline: 3px dashed var(--gold);
+  outline-offset: 6px;
+}
+
+.pv.drop .pv-empty {
+  opacity: 1;
+}
