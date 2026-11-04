@@ -17,10 +17,12 @@ def _load_env(path):
                 os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-_load_env(os.path.join(BASE, ".env"))
-
-
 SERVERLESS = bool(os.getenv("VERCEL"))  # True saat berjalan di Vercel (folder proyek hanya bisa dibaca)
+
+# Di Vercel, pengaturan HARUS dari Environment Variables dashboard. File .env milik komputer lokal
+# (DB 127.0.0.1, STORAGE=disk, dst.) tidak boleh ikut terbaca di server online.
+if not SERVERLESS:
+    _load_env(os.path.join(BASE, ".env"))
 
 
 def _secret_key():
@@ -51,7 +53,7 @@ UPLOADS = os.path.join(BASE, "uploads")
 DB_PATH = os.getenv("DB_PATH", "/tmp/parcelku.db" if SERVERLESS else os.path.join(BASE, "parcelku.db"))
 
 # Penyimpanan foto unggahan: "disk" (folder uploads/) atau "db" (di dalam database; wajib di Vercel)
-STORE_DB = os.getenv("STORAGE", "db" if SERVERLESS else "disk").strip().lower() == "db"
+STORE_DB = SERVERLESS or os.getenv("STORAGE", "disk").strip().lower() == "db"
 
 # Mesin database: "mysql" (XAMPP / MariaDB) atau "sqlite" (satu berkas, tanpa server)
 DB_ENGINE = os.getenv("DB_ENGINE", "sqlite").strip().lower()

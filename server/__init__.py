@@ -1,8 +1,8 @@
-import os
 """Pabrik aplikasi Flask Parcelku."""
+import os
 import time
 import traceback
-from flask import Flask, request, send_from_directory, send_file, abort, Response
+from flask import Flask, request, send_from_directory, send_file, abort, Response, session
 from . import config
 from .db import init_db, close_db
 from . import auth, catalog, orders, vouchers, addresses, payments, designs
@@ -71,13 +71,23 @@ def create_app():
     def need_database():
         if state["error"] is None:
             return None
+        # Menu & info toko harus tetap tampil walau database mati, jadi dua rute ini punya jawaban cadangan.
+        if request.method == "GET" and request.path == "/api/settings":
+            return config.DEFAULT_SETTINGS
+        if request.method == "GET" and request.path == "/api/me":
+            return {"role": session.get("role") if session.get("role") == "admin" else None,
+                    "nama": session.get("nama") if session.get("role") == "admin" else None}
         if time.time() - state["tried"] > 10:  # coba sambung ulang tiap 10 detik
             connect_db()
             if state["error"] is None:
                 return None
+        if request.path == "/api/health":  # selalu bisa dibuka untuk diagnosis
+            return None
         if request.path.startswith("/api/"):
             return {"error": "Database belum tersambung. Hubungi admin situs."}, 503
-        return Response(DB_ERROR_PAGE.replace("{ENGINE}", config.DB_ENGINE.upper()), status=503, mimetype="text/html")
+        if request.path.startswith("/uploads/"):
+            return Response("Database belum tersambung.", status=503, mimetype="text/plain")
+        return None  # halaman statis (HTML/CSS/JS) tetap tampil; bagian yang butuh data menampilkan pesannya sendiri
 
     @app.after_request
     def security_headers(resp):

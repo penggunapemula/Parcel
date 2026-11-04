@@ -768,7 +768,16 @@ $("#sideClose").onclick = $("#scrim").onclick = () => toggleSide(false);
 /* ---------- Inisialisasi ---------- */
 (async () => {
   ME = await initNav();
-  ITEMS = await api("/items");
+  try {
+    ITEMS = await api("/items");
+  } catch (e) {
+    const m = $("main");
+    if (m)
+      m.innerHTML = `<section class="card" style="margin:40px auto;max-width:520px;padding:28px;text-align:center">
+        <h2>Katalog belum bisa dimuat</h2><p>${esc(e.message)}</p>
+        <p><a class="btn" href="pesan.html">Coba lagi</a></p></section>`;
+    return;
+  }
   METHODS = await api("/payment-methods").catch(() => []);
   if (ME.role === "user") {
     ADDR = await api("/addresses").catch(() => []);

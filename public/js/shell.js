@@ -12,9 +12,14 @@ const TAB_ICONS = {
 const icon = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${TAB_ICONS[n]}</svg>`;
 
 async function initNav() {
-  const [me, set] = await Promise.all([api("/me"), api("/settings").catch(() => ({}))]);
+  // Bila server/database belum siap, menu tetap harus tampil (anggap pengunjung belum masuk).
+  const [me, set] = await Promise.all([
+    api("/me").catch(() => ({ role: null, nama: null })),
+    api("/settings").catch(() => ({})),
+  ]);
   window.SET = set;
-  const page = location.pathname.split("/").pop() || "beranda.html";
+  let page = location.pathname.split("/").pop() || "beranda.html";
+  if (!page.includes(".")) page += ".html"; // alamat tanpa ekstensi, mis. /pesan
   const links = [["beranda.html", "Beranda", "home"]];
   if (me.role === "admin") links.push(["admin.html", "Dashboard", "grid"]);
   else {

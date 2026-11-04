@@ -7,7 +7,7 @@
    jadi pembaruan situs selalu langsung terlihat saat online.
    Naikkan VERSION setiap kali ada rilis besar supaya cache lama dibersihkan.
    ========================================================================== */
-const VERSION = "parcelku-v4";
+const VERSION = "parcelku-v5";
 const CORE = ["/offline.html", "/icon.svg", "/icon-192.png"];
 
 self.addEventListener("install", (event) => {

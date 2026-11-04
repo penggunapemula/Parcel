@@ -1,15 +1,10 @@
-{
-  "version": 2,
-  "outputDirectory": "public",
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "{server,database}/**",
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
-    { "source": "/", "destination": "/beranda.html" },
-    { "source": "/api/:path*", "destination": "/api/index?__path=/api/:path*" },
-    { "source": "/uploads/:path*", "destination": "/api/index?__path=/uploads/:path*" }
-  ]
-}
+.env
+.secret_key
+.venv
+__pycache__
+*.pyc
+*.db
+frontend
+uploads
+MULAI-WINDOWS.bat
+MULAI-MAC-LINUX.sh
