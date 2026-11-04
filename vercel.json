@@ -1,7 +1,25 @@
-.env
-.secret_key
-__pycache__/
-*.pyc
-parcelku.db
-uploads/*
-!uploads/.gitkeep
+
+{
+  "version": 2,
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{server,database}/**",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/beranda.html"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index?__path=/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "/api/index?__path=/uploads/:path*"
+    }
+  ]
+}
