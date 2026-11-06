@@ -43,7 +43,8 @@ def create_app():
         return {"status": "ok" if state["error"] is None else "database-error", "engine": config.DB_ENGINE,
                 "serverless": config.SERVERLESS, "frontend_ada": os.path.isdir(config.FRONTEND),
                 "beranda_ada": os.path.exists(os.path.join(config.FRONTEND, "beranda.html")),
-                "path_terbaca": request.path}
+                "path_terbaca": request.path,
+                "petunjuk": state["hint"] if state["error"] else None}
 
     @app.get("/api/index")
     def entry_diagnostic():
@@ -55,7 +56,21 @@ def create_app():
                 "x_forwarded_uri": request.headers.get("x-forwarded-uri")}, 404
 
     # ---- Bila database belum tersambung, tampilkan penjelasan (bukan error 500 yang membingungkan) ----
-    state = {"error": None, "tried": 0.0}
+    state = {"error": None, "hint": "", "tried": 0.0}
+
+    def hint_for(msg):
+        """Terjemahkan pesan error database menjadi langkah perbaikan yang mudah dipahami."""
+        table = [
+            ("2003", "MySQL belum menyala atau alamatnya salah. Di XAMPP: buka XAMPP Control Panel, klik Start pada MySQL. "
+                     "Di hosting online, 127.0.0.1 tidak bisa dipakai: isi MYSQL_HOST dengan alamat database online."),
+            ("Connection refused", "MySQL belum menyala. Di XAMPP: buka XAMPP Control Panel, klik Start pada MySQL."),
+            ("1045", "Nama pengguna atau kata sandi MySQL salah. Bawaan XAMPP: MYSQL_USER=root dan MYSQL_PASSWORD dikosongkan."),
+            ("1049", "Database belum dibuat. Jalankan ulang aplikasi (dibuat otomatis) atau impor database/parcelku_xampp.sql di phpMyAdmin."),
+            ("No module named", "Paket Python belum terpasang. Jalankan: pip install -r requirements.txt"),
+            ("not a database", "Berkas parcelku.db rusak. Aplikasi akan mencadangkannya dan membuat yang baru saat dijalankan ulang."),
+            ("readonly", "Folder tidak bisa ditulis. Di Vercel gunakan MySQL online (DB_ENGINE=mysql) dan isi variabel MYSQL_* di dashboard."),
+        ]
+        return next((h for key, h in table if key in msg), "")
 
     def connect_db():
         try:
@@ -63,7 +78,10 @@ def create_app():
             state["error"] = None
         except Exception as exc:  # noqa: BLE001 - apa pun penyebabnya, jangan sampai situs mati total
             state["error"] = f"{type(exc).__name__}: {exc}"
+            state["hint"] = hint_for(state["error"])
             print("[ERROR DATABASE]", state["error"])
+            if state["hint"]:
+                print("[PETUNJUK]", state["hint"])
             traceback.print_exc()
         state["tried"] = time.time()
 

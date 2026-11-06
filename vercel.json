@@ -10,6 +10,12 @@
       "source": "/uploads/:path*",
       "destination": "/api/index?__path=/uploads/:path*"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/beranda.html",
+      "permanent": false
+    }
   ]
 }
-

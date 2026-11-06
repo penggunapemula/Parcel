@@ -160,6 +160,21 @@ def seed_payment_methods(conn):
     conn.executemany("INSERT INTO payment_methods(kode,nama,tipe,keterangan,bank,no_rek,atas_nama,urut) VALUES(?,?,?,?,?,?,?,?)", rows)
 
 
+def ensure_valid_sqlite(path):
+    """Bila berkas SQLite rusak ("file is not a database"), pindahkan sebagai cadangan lalu mulai dengan database baru."""
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        return
+    try:
+        probe = sqlite3.connect(path)
+        probe.execute("PRAGMA schema_version").fetchone()
+        probe.close()
+    except sqlite3.DatabaseError:
+        import time as _t
+        backup = f"{path}.rusak-{_t.strftime('%Y%m%d-%H%M%S')}"
+        os.replace(path, backup)
+        print(f"[PERINGATAN] {os.path.basename(path)} rusak. Disimpan sebagai {os.path.basename(backup)}, database baru dibuat.")
+
+
 def init_db():
     """Siapkan database: tabel -> migrasi kolom lama -> index/trigger/view -> data awal."""
     with open(SCHEMA_FILE, encoding="utf-8") as f:
@@ -176,6 +191,7 @@ def init_db():
             conn.execute(stmt)
     else:
         tables, rest = script.split(SPLIT)
+        ensure_valid_sqlite(config.DB_PATH)
         conn = sqlite3.connect(config.DB_PATH)
         conn.execute("PRAGMA foreign_keys = ON")
         conn.executescript(tables)
